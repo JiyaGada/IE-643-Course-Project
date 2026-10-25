@@ -6,7 +6,6 @@ Pipeline
   2. Leak-free preprocessing: climatology, scaling and the POT threshold are all
      computed on the TRAIN period only (train 2015-2020, val 2021-2022, test 2023)
   3. Pretrain the base Quantile CNN-LSTM on SOURCE grid points
-     (or load a checkpoint from your TA with --base-ckpt)
   4. Adapt to held-out TARGET grid points with: full fine-tune, LoRA, DoRA
   5. Compare zero-shot / scratch / full-FT / LoRA / DoRA on normal vs extreme events,
      over several seeds (mean +- std), before and after split-conformal calibration
@@ -28,17 +27,17 @@ warnings.filterwarnings("ignore", message=".*RNN module weights.*")
 SEQ_LEN, PRED_LEN = 72, 12
 QUANTILES = [0.05, 0.5, 0.95]
 FEATURES = ['Temperature', 'Dewpoint', 'Wind_Speed', 'Cloud_Cover', 'Precipitation']
-TRAIN_END = pd.Timestamp('2022-01-01')   # train: 2015-2020
+TRAIN_END = pd.Timestamp('2021-01-01')   # train: 2015-2020
 VAL_END = pd.Timestamp('2023-01-01')     # val: 2021-2022, test: 2023
-EXTREME_PCT = 95                         # POT threshold (matches the slides)
+EXTREME_PCT = 95                         # POT threshold
 
 
 # ==========================================
-# 1. Data retrieval + loading (unchanged apart from Dewpoint)
+# 1. Data retrieval + loading
 # ==========================================
 def download_era5_data():
     import cdsapi
-    years = [str(y) for y in range(2020, 2024)]   # 2015-2023
+    years = [str(y) for y in range(2015, 2024)]   # 2015-2023
     c = cdsapi.Client()
     for year in years:
         filename = f'era5_multivariate_data_{year}.nc'
@@ -164,9 +163,9 @@ def build_splits(df, feats, target_locs):
                            ('test', tl >= np.datetime64(VAL_END))]:
             bucket.setdefault((dom, name), []).append((X[mask], Y[mask], E[mask]))
     out = {k: tuple(np.concatenate(z, 0) for z in zip(*v)) for k, v in bucket.items()}
-    g = np.array([x[0] for x in gpd_report if not np.isnan(x[0])])
-    if len(g):
-        print(f"GPD tail shape xi over locations: mean={g.mean():.3f}, min={g.min():.3f}, max={g.max():.3f}")
+    # g = np.array([x[0] for x in gpd_report if not np.isnan(x[0])])
+    # if len(g):
+    #     print(f"GPD tail shape xi over locations: mean={g.mean():.3f}, min={g.min():.3f}, max={g.max():.3f}")
     return out
 
 
@@ -384,7 +383,7 @@ def run_seed(D, n_feats, seed, args):
     ckpt = f'base_seed{seed}.pt'
     if args.base_ckpt:
         base.load_state_dict(torch.load(args.base_ckpt, map_location='cpu'))
-        print(f"Loaded TA checkpoint {args.base_ckpt}")
+        print(f"Loaded checkpoint {args.base_ckpt}")
     elif os.path.exists(ckpt):
         base.load_state_dict(torch.load(ckpt)); print(f"Loaded {ckpt}")
     else:
@@ -449,7 +448,7 @@ if __name__ == "__main__":
     ap.add_argument('--tail-weight', type=float, default=3.0, help='pinball weight on extreme targets during adaptation')
     ap.add_argument('--n-target', type=int, default=9, help='held-out target grid points')
     ap.add_argument('--seeds', default='0,1,2', help='comma-separated seeds, e.g. 0 for a quick run')
-    ap.add_argument('--base-ckpt', default=None, help="TA's pretrained state_dict (skips pretraining)")
+    ap.add_argument('--base-ckpt', default=None, help="Pretrained state_dict (skips pretraining)")
     ap.add_argument('--no-gradio', action='store_true')
     args = ap.parse_args()
 
