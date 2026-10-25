@@ -26,11 +26,14 @@ A Quantile CNN-LSTM forecasts the next 12 six-hourly steps of temperature anomal
 
 | File | Purpose |
 |---|---|
-| `model.py` | Full pipeline: download, preprocessing, pretraining, adaptation, evaluation, conformal calibration, Gradio demo |
+| `model.py` | Full pipeline: download, preprocessing, pretraining, adaptation, evaluation, conformal calibration, Gradio demo (corresponding to E2) |
 | `show_model.py` | Reopens the Gradio demo from saved checkpoints, with no training |
 | `era5_multivariate_data_{year}.nc` | ERA5 Reanalysis dataset for the corresponding years downloaded from cdsapi |
 | `results_all_seeds.csv`, `results_summary.csv` | Written by the pipeline after a run |
 | `base_seed{S}.pt`, `lora_r4_seed{S}.pt`, `dora_r4_seed{S}.pt` | Saved checkpoints (pretrained base, adapters) |
+| `E0` | Contains the results from the experiment E0 |
+| `E3` | Contains the results, checkpoints and the model used for experiment E3 |
+| `E2 (main experiment)` | Contains the results, checkpoints and the model used for experiment E2 |
 
 ## Setup
 
