@@ -1,6 +1,6 @@
 # Multivariate Weather Forecasting with a Quantile CNN-LSTM architecture, Adapted with LoRA / DoRA
 
-IE 643 course project, team **The Epoch-alypse Survivors**
+IE-643 course project, team **The Epoch-alypse Survivors**
 Jiya Gada (24B1013) and Dwija Patel (24B0995)
 
 A Quantile CNN-LSTM forecasts the next 12 six-hourly steps of temperature anomaly from the past 72 steps of five ERA5 variables, and outputs a 90% prediction interval directly (quantiles 0.05 / 0.5 / 0.95). The model is pretrained on 72 grid points, then adapted to 9 held-out grid points with full fine-tuning, LoRA or DoRA. We compare these against zero-shot transfer and training from scratch, separately on normal and extreme events, with and without split-conformal calibration.
@@ -28,6 +28,7 @@ A Quantile CNN-LSTM forecasts the next 12 six-hourly steps of temperature anomal
 |---|---|
 | `model.py` | Full pipeline: download, preprocessing, pretraining, adaptation, evaluation, conformal calibration, Gradio demo (corresponding to E2) |
 | `show_model.py` | Reopens the Gradio demo from saved checkpoints, with no training |
+| `IE_643_Project_Report.pdf` | Report for the Course Project conducted and the results and conclusions |
 | `era5_multivariate_data_{year}.nc` | ERA5 Reanalysis dataset for the corresponding years downloaded from cdsapi |
 | `results_all_seeds.csv`, `results_summary.csv` | Written by the pipeline after a run |
 | `base_seed{S}.pt`, `lora_r4_seed{S}.pt`, `dora_r4_seed{S}.pt` | Saved checkpoints (pretrained base, adapters) |
